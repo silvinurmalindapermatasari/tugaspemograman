@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Appraisal Engine - Fintech Switch Case</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --card-bg: #111827;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --primary: #10b981;
+            /* Warna hijau emerald khas fintech sukses */
+            --primary-hover: #059669;
+            --border-color: #1f2937;
+            --accent-purple: #6366f1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 950px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sisi Kiri: Form */
+        .input-section h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #fff, var(--text-muted));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .input-section p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            appearance: none;
+            /* Menghilangkan panah bawaan select */
+        }
+
+        /* Custom panah untuk select option */
+        .select-wrapper::after {
+            content: '\f107';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 16px;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(16, 185, 129, 0.03);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+        }
+
+        /* Merapikan dropdown opsi agar teksnya terlihat di dark mode */
+        select option {
+            background-color: var(--card-bg);
+            color: white;
+        }
+
+        .btn-calculate {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .btn-calculate:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Sisi Kanan: Output */
+        .result-section {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 300px;
+        }
+
+        .result-placeholder i {
+            font-size: 3.5rem;
+            color: var(--border-color);
+            margin-bottom: 16px;
+        }
+
+        .result-placeholder p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .result-content {
+            width: 100%;
+            display: none;
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .asset-icon-box {
+            width: 64px;
+            height: 64px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            color: var(--accent-purple);
+            margin: 0 auto 16px auto;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            width: 100%;
+            margin-top: 24px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: left;
+        }
+
+        .metric-card span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .metric-card p {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+        <div class="input-section">
+            <h2>ValuatePro™ Engine</h2>
+            <p>Sistem Taksiran Nilai Aset Gadai Elektronik Berbasis Switch-Case.</p>
+
+            <div class="form-group">
+                <label for="jenisAset">Jenis Aset Elektronik</label>
+                <div class="input-wrapper select-wrapper">
+                    <i class="fa-solid fa-laptop-electron"></i>
+                    <select id="jenisAset">
+                        <option value="" disabled selected>Pilih jenis perangkat...</option>
+                        <option value="LAPTOP">Laptop / Notebook</option>
+                        <option value="HP">Smartphone / Handphone</option>
+                        <option value="TABLET">Tablet / iPad</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="kondisi">Kondisi Fisik Perangkat</label>
+                <div class="input-wrapper select-wrapper">
+                    <i class="fa-solid fa-star-half-stroke"></i>
+                    <select id="kondisi">
+                        <option value="" disabled selected>Pilih kondisi fisik...</option>
+                        <option value="MULUS">Mulus / Seperti Baru (Like New)</option>
+                        <option value="NORMAL">Normal / Lecet Pemakaian Wajar</option>
+                        <option value="MINUS">Minus Fungsi / Layar Retak</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn-calculate" onclick="hitungTaksiran()">
+                <i class="fa-solid fa-calculator"></i> Hitung Nilai Aset
+            </button>
+        </div>
+
+        <div class="result-section" id="result-box">
+            <div class="result-placeholder" id="placeholder">
+                <i class="fa-solid fa-chart-line-up"></i>
+                <p>Pilih kategori aset dan kondisinya untuk melihat kalkulasi nilai jaminan fintech.</p>
+            </div>
+
+            <div class="result-content" id="result-content">
+                <div class="asset-icon-box" id="asset-icon">
+                    <i class="fa-solid fa-laptop"></i>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Maksimum Nilai Pencairan Gadai:</p>
+                <h3 id="hasil-taksiran"
+                    style="font-size: 2rem; margin: 4px 0 24px 0; font-weight: 700; color: var(--primary);">Rp 0</h3>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-color); width: 100%;">
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span>Kategori Sistem</span>
+                        <p id="label-kategori" style="color: white;">-</p>
+                    </div>
+                    <div class="metric-card">
+                        <span>Faktor Pengurang</span>
+                        <p id="label-diskon" style="color: #ef4444;">0%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function hitungTaksiran() {
+            let jenisAset = document.getElementById("jenisAset").value;
+            let kondisi = document.getElementById("kondisi").value;
+
+            // Validasi input
+            if (!jenisAset || !kondisi) {
+                alert("Silakan tentukan jenis aset dan kondisinya terlebih dahulu.");
+                return;
+            }
+
+            let hargaDasar = 0;
+            let pengurangPersen = 0;
+            let ikonKelas = "";
+
+            // --- 1. SWITCH CASE PERTAMA: Menentukan Harga Dasar Berdasarkan Jenis Aset ---
+            switch (jenisAset) {
+                case "LAPTOP":
+                    hargaDasar = 7000000;
+                    ikonKelas = "fa-solid fa-laptop";
+                    break;
+                case "HP":
+                    hargaDasar = 4000000;
+                    ikonKelas = "fa-solid fa-mobile-screen-button";
+                    break;
+                case "TABLET":
+                    hargaDasar = 5000000;
+                    ikonKelas = "fa-solid fa-tablet-screen-button";
+                    break;
+                default:
+                    hargaDasar = 0;
+                    ikonKelas = "fa-solid fa-box";
+            }
+
+            // --- 2. SWITCH CASE KEDUA: Menentukan Faktor Pengurang Berdasarkan Kondisi ---
+            switch (kondisi) {
+                case "MULUS":
+                    pengurangPersen = 0.10; // Potongan hanya 10% dari harga pasar asli
+                    break;
+                case "NORMAL":
+                    pengurangPersen = 0.25; // Potongan 25%
+                    break;
+                case "MINUS":
+                    pengurangPersen = 0.55; // Potongan besar 55% karena ada kerusakan
+                    break;
+                default:
+                    pengurangPersen = 0;
+            }
+
+            // --- 3. PROSES KALKULASI FINANSIAL ---
+            let nilaiTaksiranAkhir = hargaDasar - (hargaDasar * pengurangPersen);
+
+            // Format angka menjadi mata uang Rupiah (IDR) otomatis
+            let formatRupiah = new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                maximumFractionDigits: 0
+            }).format(nilaiTaksiranAkhir);
+
+            // --- 4. MANIPULASI DOM UNTUK MENG-UPDATE UI ---
+            document.getElementById("placeholder").style.display = "none";
+            document.getElementById("result-content").style.display = "block";
+
+            // Update Ikon Dinamis sesuai pilihan perangkat
+            document.getElementById("asset-icon").innerHTML = `<i class="${ikonKelas}"></i>`;
+
+            // Update Teks Output Finansial
+            document.getElementById("hasil-taksiran").innerText = formatRupiah;
+            document.getElementById("label-kategori").innerText = jenisAset + " (" + kondisi + ")";
+            document.getElementById("label-diskon").innerText = "-" + (pengurangPersen * 100) + "%";
+        }
+    </script>
+</body>
+
+</html>
