@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindSpace - Simple Daily Journal</title>
+
+    <style>
+        :root {
+            --bg-deep: #090d16;
+            --bg-surface: #131a2c;
+            --bg-input: #1e2942;
+            --primary: #818cf8;
+            --primary-glow: rgba(129, 140, 248, 0.3);
+            --text-main: #f1f5f9;
+            --text-muted: #64748b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        header p { color: var(--text-muted); margin-top: 5px; }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        @media (min-width: 750px) {
+            .workspace { grid-template-columns: 350px 1fr; }
+        }
+
+        /* FORM */
+        .journal-form-box {
+            background: var(--bg-surface);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            height: fit-content;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: var(--bg-input);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* BUTTONS */
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-submit:hover { transform: translateY(-2px); }
+
+        .btn-quote {
+            background: #1e293b;
+            color: var(--text-muted);
+            margin: 0 auto 20px auto;
+            display: block;
+        }
+
+        .btn-quote:hover { color: white; }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .btn-edit { background: rgba(245, 158, 11, 0.15); color: #fbbf24; flex: 1; }
+        .btn-edit:hover { background: #fbbf24; color: #000; }
+
+        .btn-del { background: rgba(239, 68, 68, 0.15); color: #f87171; flex: 1; }
+        .btn-del:hover { background: #ef4444; color: white; }
+
+        /* CARDS */
+        .grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+
+        .card {
+            background: var(--bg-surface);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .card-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+        .card-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 5px; }
+        .card-body { font-size: 14px; color: #cbd5e1; }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>MindSpace</h1>
+            <p>Simple Daily Journal & Mood Tracker</p>
+        </header>
+
+        <button class="btn-quote" onclick="mintaNamaDanQuote()">💡 Sapa Pengguna</button>
+
+        <div class="workspace">
+            <div class="journal-form-box">
+                <form id="journalForm" onsubmit="tambahJurnal(event)">
+                    <label for="title">Judul Hari Ini</label>
+                    <input type="text" id="title" placeholder="Ada cerita apa?" required>
+
+                    <label for="content">Isi Cerita</label>
+                    <textarea id="content" rows="4" placeholder="Tuliskan refleksimu..." required></textarea>
+
+                    <label for="mood">Suasana Hati</label>
+                    <select id="mood">
+                        <option value="😃 Senang">😃 Senang</option>
+                        <option value="😐 Biasa Aja">😐 Biasa Aja</option>
+                        <option value="😔 Sedih/Lelah">😔 Sedih / Lelah</option>
+                    </select>
+
+                    <button type="submit" class="btn-submit">Simpan ke Jurnal</button>
+                </form>
+            </div>
+
+            <div class="grid" id="output"></div>
+        </div>
+    </div>
+
+    <script>
+        // Array biasa untuk menampung data (Tanpa Class/OOP)
+        let listJurnal = JSON.parse(localStorage.getItem("simple_jurnal")) || [];
+
+        // 1. FUNGSI PROMPT & ALERT
+        function mintaNamaDanQuote() {
+            let nama = prompt("Siapa namamu?", "Teman");
+            
+            if (nama !== null && nama.trim() !== "") {
+                alert("Halo " + nama + "! Selamat datang di ruang refleksimu sendiri. Jangan lupa catat harimu!");
+            }
+        }
+
+        // 2. FUNGSI FORM SUBMISSION + ALERT
+        function tambahJurnal(event) {
+            event.preventDefault(); // Mencegah reload halaman
+
+            let judulInput = document.getElementById("title").value;
+            let isiInput = document.getElementById("content").value;
+            let moodInput = document.getElementById("mood").value;
+            let tanggalSekarang = new Date().toLocaleDateString('id-ID');
+
+            // Membuat objek data sederhana
+            let dataBaru = {
+                judul: judulInput,
+                isi: isiInput,
+                mood: moodInput,
+                tanggal: tanggalSekarang
+            };
+
+            listJurnal.unshift(dataBaru); // Masukkan ke urutan paling atas
+            simpanData();
+            tampilkanJurnal();
+
+            document.getElementById("journalForm").reset(); // Kosongkan form
+
+            alert("✅ Sukses! Cerita harimu berhasil disimpan.");
+        }
+
+        // 3. FUNGSI PROMPT (UNTUK EDIT DATA)
+        function editJurnal(index) {
+            let jurnalDipilih = listJurnal[index];
+
+            let judulBaru = prompt("Ubah Judul:", jurnalDipilih.judul);
+            if (judulBaru === null || judulBaru.trim() === "") return;
+
+            let isiBaru = prompt("Ubah Isi Cerita:", jurnalDipilih.isi);
+            if (isiBaru === null || isiBaru.trim() === "") return;
+
+            // Update datanya
+            listJurnal[index].judul = judulBaru;
+            listJurnal[index].isi = isiBaru;
+
+            simpanData();
+            tampilkanJurnal();
+            alert("🔄 Jurnal berhasil diperbarui!");
+        }
+
+        // 4. FUNGSI CONFIRM (UNTUK HAPUS DATA)
+        function hapusJurnal(index) {
+            let konfirmasi = confirm("Apakah kamu yakin ingin menghapus cerita ini?");
+            
+            if (konfirmasi) {
+                listJurnal.splice(index, 1); // Hapus dari array
+                simpanData();
+                tampilkanJurnal();
+            }
+        }
+
+        // Fungsi pendukung untuk LocalStorage
+        function simpanData() {
+            localStorage.setItem("simple_jurnal", JSON.stringify(listJurnal));
+        }
+
+        // Fungsi render data ke HTML
+        function tampilkanJurnal() {
+            let tempatOutput = document.getElementById("output");
+            tempatOutput.innerHTML = "";
+
+            if (listJurnal.length === 0) {
+                tempatOutput.innerHTML = `<p style="text-align:center; color: var(--text-muted); padding: 30px 0;">Jurnal kosong. Yuk, tulis cerita pertamamu!</p>`;
+                return;
+            }
+
+            listJurnal.forEach((jurnal, i) => {
+                tempatOutput.innerHTML += `
+                    <div class="card">
+                        <div class="card-header">
+                            <span>${jurnal.tanggal}</span>
+                            <span>Mood: <b>${jurnal.mood}</b></span>
+                        </div>
+                        <div class="card-title">${jurnal.judul}</div>
+                        <div class="card-body">${jurnal.isi}</div>
+                        <div class="card-actions">
+                            <button class="btn-edit" onclick="editJurnal(${i})">Edit</button>
+                            <button class="btn-del" onclick="hapusJurnal(${i})">Hapus</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Jalankan fungsi tampilkan data saat halaman pertama dibuka
+        tampilkanJurnal();
+    </script>
+</body>
+</html>
