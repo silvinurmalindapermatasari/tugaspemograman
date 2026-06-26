@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise HR Dashboard (OOP-Based)</title>
+
+    <style>
+        /* ================= MODERN RESET & VARIABLES ================= */
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --warning: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+
+            --badge-emp: #64748b;
+            --badge-mgr: #10b981;
+            --badge-dev: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* ================= ANIMATIONS ================= */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ================= AUTH PAGE ================= */
+        .login-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        #loginBox {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+            animation: fadeIn 0.5s ease-out;
+            border: 1px solid #2e3d52;
+        }
+
+        #loginBox h2 {
+            margin-bottom: 24px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        /* ================= FORMS & INPUTS ================= */
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            background: var(--bg-input);
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: white;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        /* ================= BUTTONS ================= */
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-action-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-action-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-edit {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-edit:hover {
+            background: var(--warning);
+            color: #0f172a;
+        }
+
+        /* ================= DASHBOARD LAYOUT ================= */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        @media (min-width: 850px) {
+            .main-layout {
+                grid-template-columns: 350px 1fr;
+            }
+        }
+
+        .form-box {
+            background: var(--bg-card);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid #2e3d52;
+            height: fit-content;
+        }
+
+        .form-box h3 {
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* ================= FILTER CHIPS ================= */
+        .filter-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-filter {
+            background: #1e293b;
+            color: var(--text-muted);
+            border: 1px solid #334155;
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        .btn-filter.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* ================= CARDS GRID ================= */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid #2e3d52;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .card-meta {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .card-extra {
+            background: #141e30;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .card-actions button {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .badge.employee {
+            background: rgba(100, 116, 139, 0.2);
+            color: #cbd5e1;
+        }
+
+        .badge.manager {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        .badge.developer {
+            background: rgba(139, 92, 246, 0.2);
+            color: #c084fc;
+        }
+
+        #loginMsg {
+            color: var(--danger);
+            font-size: 14px;
+            text-align: center;
+            margin-top: 12px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-wrapper" id="loginWrapper">
+        <div id="loginBox">
+            <h2>Sign In</h2>
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Masukkan 'admin'">
+
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Masukkan '123'">
+
+            <button class="btn-primary" onclick="login()">Login to Dashboard</button>
+            <p id="loginMsg"></p>
+        </div>
+    </div>
+
+    <div id="dashboard" class="container" style="display:none;">
+
+        <div class="dashboard-header">
+            <div>
+                <h2>Enterprise HR Center</h2>
+                <p style="color: var(--text-muted); font-size: 14px;">Manage your multi-role workforce seamlessly.</p>
+            </div>
+            <button class="btn-danger" style="padding: 8px 16px;" onclick="logout()">Logout</button>
+        </div>
+
+        <div class="main-layout">
+            <div class="form-box">
+                <h3>Karyawan Baru</h3>
+
+                <label for="name">Nama Lengkap</label>
+                <input type="text" id="name" placeholder="John Doe">
+
+                <label for="age">Umur (Tahun)</label>
+                <input type="number" id="age" placeholder="18 - 60">
+
+                <label for="salary">Gaji Pokok (Rp)</label>
+                <input type="number" id="salary" placeholder="2.000.000 - 10.000.000">
+
+                <label for="type">Role / Jabatan</label>
+                <select id="type" onchange="handleRoleChange()">
+                    <option value="employee">Regular Employee</option>
+                    <option value="manager">Manager</option>
+                    <option value="developer">Developer</option>
+                </select>
+
+                <label id="extraLabel" for="extra">Informasi Tambahan (Opsional)</label>
+                <input type="text" id="extra" placeholder="Aset tambahan..." disabled style="opacity: 0.5;">
+
+                <button class="btn-action-primary" style="width: 100%; margin-top: 10px;" onclick="addEmployee()">+
+                    Tambah Staff</button>
+            </div>
+
+            <div>
+                <div class="filter-container">
+                    <button class="btn-filter active" id="btn-all" onclick="filterData('all')">All Roles</button>
+                    <button class="btn-filter" id="btn-employee" onclick="filterData('employee')">Employees</button>
+                    <button class="btn-filter" id="btn-manager" onclick="filterData('manager')">Managers</button>
+                    <button class="btn-filter" id="btn-developer" onclick="filterData('developer')">Developers</button>
+                </div>
+
+                <div id="output" class="grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ================= AUTHENTICATION ================= */
+        function login() {
+            let u = document.getElementById("username").value;
+            let p = document.getElementById("password").value;
+
+            if (u === "admin" && p === "123") {
+                document.getElementById("loginWrapper").style.display = "none";
+                document.getElementById("dashboard").style.display = "block";
+                render(); // Render data saat login sukses
+            } else {
+                document.getElementById("loginMsg").innerText = "Kredensial salah. Coba lagi!";
+            }
+        }
+
+        function logout() {
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("loginWrapper").style.display = "flex";
+            document.getElementById("dashboard").style.display = "none";
+        }
+
+        /* ================= OOP LOGIC WITH INHERITANCE ================= */
+        class Employee {
+            constructor(name, age, salary) {
+                this.name = name;
+                this.age = age;
+                this.salary = salary;
+                this.type = "employee";
+            }
+
+            // Method dasar polymorphism / enkapsulasi data
+            info() {
+                return `${this.name}`;
+            }
+
+            getFormattedSalary() {
+                return "Rp " + this.salary.toLocaleString('id-ID');
+            }
+        }
+
+        class Manager extends Employee {
+            constructor(name, age, salary, bonus) {
+                super(name, age, salary);
+                this.bonus = bonus;
+                this.type = "manager";
+            }
+
+            // Method spesifik Manager untuk hitung total take-home pay
+            getTotalIncome() {
+                return this.salary + this.bonus;
+            }
+        }
+
+        class Developer extends Employee {
+            constructor(name, age, salary, skills) {
+                super(name, age, salary);
+                // Menghapus string kosong jika input dipisah koma berlebih
+                this.skills = skills.map(s => s.trim()).filter(s => s !== "");
+                this.type = "developer";
+            }
+        }
+
+        /* ================= DATA CONVERSION (REHYDRATION) ================= */
+        // Berfungsi memetakan ulang Object dari LocalStorage kembali menjadi instance Class aslinya
+        function loadEmployees() {
+            let rawData = JSON.parse(localStorage.getItem("employees_advanced")) || [];
+            return rawData.map(item => {
+                if (item.type === "manager") {
+                    return new Manager(item.name, item.age, item.salary, item.bonus);
+                } else if (item.type === "developer") {
+                    return new Developer(item.name, item.age, item.salary, item.skills);
+                } else {
+                    return new Employee(item.name, item.age, item.salary);
+                }
+            });
+        }
+
+        let employees = loadEmployees();
+        let currentFilter = "all";
+
+        function save() {
+            localStorage.setItem("employees_advanced", JSON.stringify(employees));
+        }
+
+        /* ================= DYNAMIC FORM INTERACTION ================= */
+        function handleRoleChange() {
+            let type = document.getElementById("type").value;
+            let extraInput = document.getElementById("extra");
+            let extraLabel = document.getElementById("extraLabel");
+
+            extraInput.disabled = false;
+            extraInput.style.opacity = "1";
+
+            if (type === "manager") {
+                extraLabel.innerText = "Bonus Manager (Rp)";
+                extraInput.placeholder = "Contoh: 1000000";
+                extraInput.type = "number";
+            } else if (type === "developer") {
+                extraLabel.innerText = "Keahlian / Skills";
+                extraInput.placeholder = "React, Node.js, Python";
+                extraInput.type = "text";
+            } else {
+                extraLabel.innerText = "Informasi Tambahan";
+                extraInput.placeholder = "Tidak diperlukan untuk Regular Staff";
+                extraInput.disabled = true;
+                extraInput.style.opacity = "0.5";
+                extraInput.value = "";
+            }
+        }
+
+        /* ================= CRUD ACTIONS ================= */
+        function addEmployee() {
+            let name = document.getElementById("name").value.trim();
+            let age = Number(document.getElementById("age").value);
+            let salary = Number(document.getElementById("salary").value);
+            let type = document.getElementById("type").value;
+            let extra = document.getElementById("extra").value;
+
+            // Validasi Input Utama
+            if (!name) return alert("Nama tidak boleh kosong!");
+            if (age < 18 || age > 60) return alert("Umur produktif harus di rentang 18 - 60 tahun!");
+            if (salary < 2000000 || salary > 10000000) return alert("Batas Standar Gaji: Rp 2 Jt - Rp 10 Jt");
+
+            let newStaff;
+
+            if (type === "manager") {
+                let bonus = Number(extra);
+                if (!extra || bonus < 500000 || bonus > 5000000) {
+                    return alert("Bonus manager wajib diisi berkisar antara Rp 500.000 - Rp 5.000.000");
+                }
+                newStaff = new Manager(name, age, salary, bonus);
+            }
+            else if (type === "developer") {
+                if (!extra.trim()) return alert("Tulis minimal satu skill Developer!");
+                newStaff = new Developer(name, age, salary, extra.split(","));
+            }
+            else {
+                newStaff = new Employee(name, age, salary);
+            }
+
+            employees.push(newStaff);
+            save();
+            render();
+
+            // Reset Form Input
+            document.getElementById("name").value = "";
+            document.getElementById("age").value = "";
+            document.getElementById("salary").value = "";
+            document.getElementById("extra").value = "";
+        }
+
+        function hapus(index) {
+            if (confirm("Apakah Anda yakin ingin menghapus data staff ini?")) {
+                employees.splice(index, 1);
+                save();
+                render();
+            }
+        }
+
+        function edit(index) {
+            let e = employees[index];
+
+            let newName = prompt("Edit Nama Karyawan:", e.name);
+            if (newName === null) return; // batalkan jika klik cancel
+            newName = newName.trim();
+            if (!newName) return alert("Nama tidak boleh kosong!");
+
+            let newAge = Number(prompt("Edit Umur Karyawan:", e.age));
+            if (newAge < 18 || newAge > 60) return alert("Batas umur 18 - 60 tahun!");
+
+            let newSalary = Number(prompt("Edit Gaji Pokok:", e.salary));
+            if (newSalary < 2000000 || newSalary > 10000000) return alert("Gaji pokok di luar rentang perusahaan!");
+
+            // Update data dengan instansiasi class agar properti baru tersinkronisasi
+            if (e.type === "manager") {
+                let newBonus = Number(prompt("Edit Bonus Manager:", e.bonus));
+                if (newBonus < 500000 || newBonus > 5000000) return alert("Bonus di luar kriteria!");
+                employees[index] = new Manager(newName, newAge, newSalary, newBonus);
+            } else if (e.type === "developer") {
+                let newSkills = prompt("Edit Keterampilan (pisahkan dengan koma):", e.skills.join(", "));
+                if (!newSkills) return alert("Minimal harus ada 1 skill!");
+                employees[index] = new Developer(newName, newAge, newSalary, newSkills.split(","));
+            } else {
+                employees[index] = new Employee(newName, newAge, newSalary);
+            }
+
+            save();
+            render();
+        }
+
+        function filterData(type) {
+            currentFilter = type;
+
+            // Mengubah style tombol filter aktif
+            document.querySelectorAll(".btn-filter").forEach(btn => btn.classList.remove("active"));
+            document.getElementById(`btn-${type}`).classList.add("active");
+
+            render();
+        }
+
+        /* ================= RENDERING WORKSPACE ================= */
+        function render() {
+            let container = document.getElementById("output");
+            container.innerHTML = "";
+
+            if (employees.length === 0) {
+                container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">Tidak ada data karyawan ditemukan.</p>`;
+                return;
+            }
+
+            employees.forEach((e, i) => {
+                // Skrinning Filter Jajaran
+                if (currentFilter !== "all" && e.type !== currentFilter) return;
+
+                let badge = `<span class="badge ${e.type}">${e.type}</span>`;
+                let infoDetail = "";
+
+                // Ekstraksi info berdasarkan karakteristik Objek Warisan (Polymorphism)
+                if (e instanceof Manager) {
+                    infoDetail = `
+                        <div class="card-extra">
+                            <b style="color: #34d399">Total Take-Home Pay:</b><br>
+                            Rp ${e.getTotalIncome().toLocaleString('id-ID')} 
+                            <small style="color: var(--text-muted); display:block;">(Gaji + Bonus: Rp ${e.bonus.toLocaleString('id-ID')})</small>
+                        </div>`;
+                } else if (e instanceof Developer) {
+                    let tags = e.skills.map(s => `<span style="background: #4c1d95; color: #ddd6fe; padding: 2px 6px; font-size:11px; border-radius:4px; margin-right:4px; display:inline-block; margin-top:4px;">${s}</span>`).join("");
+                    infoDetail = `
+                        <div class="card-extra" style="border-color: var(--badge-dev)">
+                            <b style="color: #c084fc">Tech Stack Capability:</b><br>
+                            ${tags || '<span style="color:var(--text-muted)">No skill registered</span>'}
+                        </div>`;
+                } else {
+                    infoDetail = `
+                        <div class="card-extra" style="border-color: var(--badge-emp)">
+                            <b>Base Compensation:</b><br>
+                            ${e.getFormattedSalary()}
+                        </div>`;
+                }
+
+                container.innerHTML += `
+                    <div class="card">
+                        <div>
+                            <div class="card-header">
+                                <span class="card-title">${e.info()}</span>
+                                ${badge}
+                            </div>
+                            <div class="card-meta">
+                                Usia: ${e.age} Tahun <br>
+                                Gaji Pokok: Rp ${e.salary.toLocaleString('id-ID')}
+                            </div>
+                            ${infoDetail}
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-edit" onclick="edit(${i})">Modify</button>
+                            <button class="btn-danger" onclick="hapus(${i})">Terminate</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+
+</html>
