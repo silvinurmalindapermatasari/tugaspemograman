@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Operator Perbandingan Modern</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .container {
+
+            width: 90%;
+            max-width: 700px;
+
+            background: rgba(255, 255, 255, .15);
+            backdrop-filter: blur(18px);
+
+            border-radius: 20px;
+
+            padding: 35px;
+
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+
+            color: white;
+        }
+
+        h1 {
+
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+
+            margin-bottom: 20px;
+        }
+
+        label {
+
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+
+            width: 100%;
+
+            padding: 13px;
+
+            border: none;
+
+            outline: none;
+
+            border-radius: 10px;
+
+            font-size: 16px;
+        }
+
+        .button-group {
+
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+
+            flex: 1;
+
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            transition: .3s;
+        }
+
+        .btn1 {
+
+            background: #00c853;
+            color: white;
+        }
+
+        .btn2 {
+
+            background: #ef5350;
+            color: white;
+        }
+
+        button:hover {
+
+            transform: translateY(-3px);
+        }
+
+        table {
+
+            width: 100%;
+            margin-top: 30px;
+
+            border-collapse: collapse;
+
+            animation: fade .5s;
+        }
+
+        th {
+
+            background: white;
+            color: #333;
+        }
+
+        td,
+        th {
+
+            padding: 12px;
+
+            text-align: center;
+
+            border: 1px solid rgba(255, 255, 255, .3);
+        }
+
+        .true {
+
+            color: #00ff7f;
+            font-weight: bold;
+        }
+
+        .false {
+
+            color: #ff5252;
+            font-weight: bold;
+        }
+
+        #error {
+
+            color: yellow;
+
+            margin-top: 15px;
+
+            text-align: center;
+
+            font-weight: bold;
+        }
+
+        @keyframes fade {
+
+            from {
+
+                opacity: 0;
+                transform: translateY(20px);
+
+            }
+
+            to {
+
+                opacity: 1;
+                transform: translateY(0);
+
+            }
+
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>📊 Operator Perbandingan</h1>
+
+        <div class="input-group">
+
+            <label>Angka Pertama</label>
+
+            <input type="number" id="angka1" placeholder="Masukkan angka pertama">
+
+        </div>
+
+        <div class="input-group">
+
+            <label>Angka Kedua</label>
+
+            <input type="number" id="angka2" placeholder="Masukkan angka kedua">
+
+        </div>
+
+        <div class="button-group">
+
+            <button class="btn1" onclick="cek()">Bandingkan</button>
+
+            <button class="btn2" onclick="resetData()">Reset</button>
+
+        </div>
+
+        <p id="error"></p>
+
+        <div id="hasil"></div>
+
+    </div>
+
+    <script>
+
+        function status(value) {
+
+            return value
+                ? '<span class="true">TRUE ✅</span>'
+                : '<span class="false">FALSE ❌</span>';
+
+        }
+
+        function cek() {
+
+            let a = document.getElementById("angka1").value;
+            let b = document.getElementById("angka2").value;
+
+            if (a == "" || b == "") {
+
+                document.getElementById("error").innerHTML = "⚠ Silakan isi kedua angka terlebih dahulu.";
+
+                document.getElementById("hasil").innerHTML = "";
+
+                return;
+
+            }
+
+            document.getElementById("error").innerHTML = "";
+
+            a = Number(a);
+            b = Number(b);
+
+            let html = `
+
+<table>
+
+<tr>
+
+<th>Operator</th>
+
+<th>Hasil</th>
+
+</tr>
+
+<tr>
+
+<td>${a} > ${b}</td>
+
+<td>${status(a > b)}</td>
+
+</tr>
+
+<tr>
+
+<td>${a} < ${b}</td>
+
+<td>${status(a < b)}</td>
+
+</tr>
+
+<tr>
+
+<td>${a} >= ${b}</td>
+
+<td>${status(a >= b)}</td>
+
+</tr>
+
+<tr>
+
+<td>${a} <= ${b}</td>
+
+<td>${status(a <= b)}</td>
+
+</tr>
+
+<tr>
+
+<td>${a} == ${b}</td>
+
+<td>${status(a == b)}</td>
+
+</tr>
+
+<tr>
+
+<td>${a} != ${b}</td>
+
+<td>${status(a != b)}</td>
+
+</tr>
+
+</table>
+
+`;
+
+            document.getElementById("hasil").innerHTML = html;
+
+        }
+
+        function resetData() {
+
+            document.getElementById("angka1").value = "";
+            document.getElementById("angka2").value = "";
+            document.getElementById("hasil").innerHTML = "";
+            document.getElementById("error").innerHTML = "";
+
+        }
+
+    </script>
+
+</body>
+
+</html>
