@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIAKAD UNPAM - Sistem Data Mahasiswa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-body: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border-color: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .header-dashboard {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .header-dashboard h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-dashboard h2 span {
+            color: var(--primary);
+        }
+
+        .badge-count {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 28px;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-style {
+            padding: 12px 14px;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .input-style:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        select option {
+            background-color: var(--card-bg);
+            color: white;
+        }
+
+        form button {
+            margin-top: 10px;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        form button:hover {
+            background: var(--primary-hover);
+        }
+
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 16px;
+            color: var(--text-muted);
+        }
+
+        #search {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: white;
+            font-size: 0.95rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        th {
+            background: #1e293b;
+            padding: 16px;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-action.edit {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .btn-action.edit:hover {
+            background: var(--warning);
+            color: black;
+        }
+
+        .btn-action.delete {
+            background: rgba(239, 64, 64, 0.15);
+            color: var(--danger);
+        }
+
+        .btn-action.delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Toast & Modal */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: var(--card-bg);
+            border-left: 4px solid var(--primary);
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s ease;
+            z-index: 999;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .modal-box i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .modal-box .icon-delete {
+            color: var(--danger);
+        }
+
+        .modal-box .icon-edit {
+            color: var(--warning);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .modal-btn.confirm {
+            background: var(--primary);
+            color: white;
+        }
+
+        .modal-btn.confirm.danger-zone {
+            background: var(--danger);
+        }
+
+        .modal-btn.cancel {
+            background: var(--border-color);
+            color: var(--text-main);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px !important;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header-dashboard">
+            <h2>SIAKAD <span>UNPAM</span></h2>
+            <div class="badge-count" id="total-badge">0 Mahasiswa Terdaftar</div>
+        </div>
+
+        <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="search" placeholder="Cari nama atau NIM mahasiswa...">
+        </div>
+
+        <div class="main-grid">
+            <div class="card">
+                <div class="card-title" id="form-title">
+                    <i class="fa-solid fa-user-plus" style="color: var(--primary)"></i> Input Data Baru
+                </div>
+                <form id="form">
+                    <div class="form-group">
+                        <label>NIM</label>
+                        <input type="text" id="nim" class="input-style" placeholder="Nomor Induk..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Lengkap</label>
+                        <input type="text" id="nama" class="input-style" placeholder="Nama..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fakultas</label>
+                        <select id="fakultas" class="input-style" onchange="updateJurusan()" required>
+                            <option value="" disabled selected>-- Pilih Fakultas --</option>
+                            <option value="Teknik">Fakultas Teknik</option>
+                            <option value="Ilmu Komputer">Fakultas Ilmu Komputer</option>
+                            <option value="Ekonomi dan Bisnis">Fakultas Ekonomi & Bisnis</option>
+                            <option value="Hukum">Fakultas Hukum</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Jurusan</label>
+                        <select id="jurusan" class="input-style" required disabled>
+                            <option value="" disabled selected>-- Pilih Fakultas Terlebih Dahulu --</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Simpan Data</button>
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>NIM</th>
+                            <th>Nama</th>
+                            <th>Jurusan & Fakultas</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabel"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-box"></div>
+    <div class="modal-overlay" id="custom-modal">
+        <div class="modal-box">
+            <div id="modal-icon-box"></div>
+            <h4 id="modal-title" style="margin-bottom: 8px;">Konfirmasi</h4>
+            <p id="modal-desc" style="color: var(--text-muted); font-size: 0.9rem;"></p>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeModal()">Batal</button>
+                <button class="modal-btn confirm" id="modal-confirm-btn">Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Struktur Jurusan UNPAM
+        const dataWilayahUNPAM = {
+            "Teknik": ["Teknik Informatika", "Teknik Mesin", "Teknik Elektro", "Teknik Industri", "Teknik Kimia"],
+            "Ilmu Komputer": ["Sistem Informasi", "Teknik Komputer"],
+            "Ekonomi dan Bisnis": ["Manajemen", "Akuntansi"],
+            "Hukum": ["Ilmu Hukum"]
+        };
+
+        let data = JSON.parse(localStorage.getItem("mahasiswa")) || [];
+        let editIndex = -1;
+
+        const form = document.getElementById("form");
+        const tabel = document.getElementById("tabel");
+        const search = document.getElementById("search");
+        const totalBadge = document.getElementById("total-badge");
+        const formTitle = document.getElementById("form-title");
+        const submitBtn = document.getElementById("submit-btn");
+
+        const nim = document.getElementById("nim");
+        const nama = document.getElementById("nama");
+        const fakultas = document.getElementById("fakultas");
+        const jurusan = document.getElementById("jurusan");
+
+        /* ===================== LOGIKA DROPDOWN DINAMIS UNPAM ===================== */
+        function updateJurusan(selectedJurusanValue = "") {
+            const fakultasTerpilih = fakultas.value;
+
+            // Kosongkan dropdown jurusan awal
+            jurusan.innerHTML = '<option value="" disabled selected>-- Pilih Jurusan --</option>';
+
+            if (fakultasTerpilih && dataWilayahUNPAM[fakultasTerpilih]) {
+                jurusan.removeAttribute("disabled");
+
+                // Isi opsi jurusan berdasarkan array data UNPAM
+                dataWilayahUNPAM[fakultasTerpilih].forEach(jrs => {
+                    const option = document.createElement("option");
+                    option.value = jrs;
+                    option.text = jrs;
+                    if (jrs === selectedJurusanValue) option.selected = true;
+                    jurusan.appendChild(option);
+                });
+            } else {
+                jurusan.setAttribute("disabled", true);
+            }
+        }
+
+        /* ===================== TOAST NOTIFICATION ===================== */
+        function showToast(msg, type = "success") {
+            const toastContainer = document.getElementById("toast-box");
+            const toast = document.createElement("div");
+            toast.className = `toast ${type}`;
+            const icon = type === "success" ? "fa-circle-check" : "fa-circle-exclamation";
+            toast.innerHTML = `<i class="fa-solid ${icon}" style="color: ${type === 'success' ? 'var(--success)' : 'var(--danger)'};"></i> <span>${msg}</span>`;
+            toastContainer.appendChild(toast);
+            setTimeout(() => toast.classList.add("show"), 10);
+            setTimeout(() => { toast.classList.remove("show"); setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        /* ===================== MODAL COMPONENT ===================== */
+        function openModal(title, desc, isDelete, onConfirm) {
+            const modal = document.getElementById("custom-modal");
+            document.getElementById("modal-title").innerText = title;
+            document.getElementById("modal-desc").innerText = desc;
+            const confirmBtn = document.getElementById("modal-confirm-btn");
+            document.getElementById("modal-icon-box").innerHTML = isDelete ? '<i class="fa-solid fa-triangle-exclamation icon-delete"></i>' : '<i class="fa-solid fa-user-pen icon-edit"></i>';
+            confirmBtn.className = isDelete ? "modal-btn confirm danger-zone" : "modal-btn confirm";
+            modal.classList.add("active");
+            confirmBtn.onclick = function () { onConfirm(); closeModal(); };
+        }
+
+        function closeModal() { document.getElementById("custom-modal").classList.remove("active"); }
+
+        /* ===================== CORE CRUD RENDERING ===================== */
+        function render(dataRender = data) {
+            tabel.innerHTML = "";
+            totalBadge.innerText = `${data.length} Mahasiswa Terdaftar`;
+
+            if (dataRender.length === 0) {
+                tabel.innerHTML = `<tr><td colspan="4" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom:12px; display:block;"></i>Belum ada rekaman data mahasiswa.</td></tr>`;
+                return;
+            }
+
+            dataRender.forEach((m) => {
+                const index = data.indexOf(m);
+                const isEditing = index === editIndex;
+
+                tabel.innerHTML += `
+                    <tr ${isEditing ? 'style="background: rgba(245, 158, 11, 0.06);"' : ""}>
+                        <td style="font-weight: 600; color: ${isEditing ? 'var(--warning)' : 'white'}">${m.nim}</td>
+                        <td><div style="font-weight: 500;">${m.nama}</div></td>
+                        <td>
+                            <div>${m.jurusan}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Fakultas ${m.fakultas}</div>
+                        </td>
+                        <td>
+                            <div class="actions-cell">
+                                <button class="btn-action edit" onclick="askEdit(${index})"><i class="fa-solid fa-pen"></i> Edit</button>
+                                <button class="btn-action delete" onclick="askDelete(${index})"><i class="fa-solid fa-trash"></i> Hapus</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            localStorage.setItem("mahasiswa", JSON.stringify(data));
+        }
+
+        /* ===================== ACTIONS ===================== */
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const duplicate = data.find((m, i) => m.nim === nim.value && i !== editIndex);
+            if (duplicate) {
+                showToast("NIM ini sudah terdaftar!", "error");
+                return;
+            }
+
+            const mhs = { nim: nim.value, nama: nama.value, jurusan: jurusan.value, fakultas: fakultas.value };
+
+            if (editIndex === -1) {
+                data.push(mhs);
+                showToast("Data mahasiswa UNPAM ditambahkan!");
+            } else {
+                data[editIndex] = mhs;
+                showToast("Data mahasiswa diperbarui.");
+                editIndex = -1;
+                formTitle.innerHTML = '<i class="fa-solid fa-user-plus" style="color: var(--primary)"></i> Input Data Baru';
+                submitBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Data';
+                nim.removeAttribute("readonly");
+            }
+
+            form.reset();
+            jurusan.setAttribute("disabled", true);
+            render();
+        });
+
+        function askDelete(i) {
+            openModal("Hapus Data?", `Hapus berkas mahasiswa bernama "${data[i].nama}"?`, true, function () {
+                data.splice(i, 1);
+                if (editIndex === i) { form.reset(); editIndex = -1; nim.removeAttribute("readonly"); }
+                showToast("Data berhasil dihapus.", "error");
+                render();
+            });
+        }
+
+        function askEdit(i) {
+            openModal("Mode Koreksi?", `Ubah data informasi akademik "${data[i].nama}"?`, false, function () {
+                const m = data[i];
+                nim.value = m.nim;
+                nama.value = m.nama;
+                fakultas.value = m.fakultas;
+
+                // Memicu trigger pengisian dropdown sub-jurusan sesuai fakultas tersimpan
+                updateJurusan(m.jurusan);
+
+                editIndex = i;
+                formTitle.innerHTML = '<i class="fa-solid fa-user-pen" style="color: var(--warning)"></i> Ubah Data Mahasiswa';
+                submitBtn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Terapkan Perubahan';
+                nim.setAttribute("readonly", true);
+                nama.focus();
+                render();
+            });
+        }
+
+        search.addEventListener("input", function () {
+            const keyword = this.value.toLowerCase();
+            const filtered = data.filter(m => m.nama.toLowerCase().includes(keyword) || m.nim.toLowerCase().includes(keyword));
+            render(filtered);
+        });
+
+        render();
+    </script>
+</body>
+
+</html>
