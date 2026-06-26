@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Engine - Advanced Credit Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: #151c2c;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --border-color: #24324d;
+
+            /* Status Colors */
+            --low-risk: #10b981;
+            --mid-risk: #f59e0b;
+            --high-risk: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 950px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            background: var(--card-bg);
+            border: 1fr solid var(--border-color);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Column Left: Input Form */
+        .input-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #fff, var(--text-muted));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .input-section p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.05);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+
+        .btn-analyze {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .btn-analyze:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Column Right: Result Display */
+        .result-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 300px;
+        }
+
+        .result-placeholder i {
+            font-size: 3.5rem;
+            color: var(--border-color);
+            margin-bottom: 16px;
+        }
+
+        .result-placeholder p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Dynamic Result Styling via JS */
+        .result-content {
+            width: 100%;
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .risk-low {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--low-risk);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .risk-mid {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--mid-risk);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .risk-high {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--high-risk);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            width: 100%;
+            margin-top: 24px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: left;
+        }
+
+        .metric-card span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .metric-card p {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+        <div class="input-section">
+            <h2>RiskEngine™ v1.0</h2>
+            <p>Sistem Analisis Risiko Kredit Berbasis Keputusan Instan.</p>
+
+            <div class="form-group">
+                <label for="skor">Skor Kredit (300 - 850)</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <input type="number" id="skor" placeholder="Contoh: 720">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="pendapatan">Pendapatan Bulanan (Rp)</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-wallet"></i>
+                    <input type="number" id="pendapatan" placeholder="Contoh: 8500000">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="kerja">Masa Kerja (Tahun)</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-briefcase"></i>
+                    <input type="number" id="kerja" placeholder="Contoh: 3">
+                </div>
+            </div>
+
+            <button class="btn-analyze" onclick="analisis()">
+                <i class="fa-solid fa-bolt"></i> Jalankan Analisis
+            </button>
+        </div>
+
+        <div class="result-section" id="result-box">
+            <div class="result-placeholder" id="placeholder">
+                <i class="fa-solid fa-shield-halved"></i>
+                <p>Masukkan parameter data di sebelah kiri untuk menghasilkan skor risiko.</p>
+            </div>
+
+            <div class="result-content" id="result-content">
+                <span id="risk-badge" class="risk-badge">RISIKO</span>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Keputusan Sistem Finansial:</p>
+                <h3 id="hasil-keputusan" style="font-size: 1.8rem; margin: 8px 0 24px 0; font-weight: 700;">-</h3>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-color); width: 100%;">
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span>Plafon Maksimal</span>
+                        <p id="plafon-limit" style="color: white;">Rp 0</p>
+                    </div>
+                    <div class="metric-card">
+                        <span>Suku Bunga Anual</span>
+                        <p id="bunga-rate" style="color: white;">0%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function analisis() {
+            let skor = Number(document.getElementById("skor").value);
+            let pendapatan = Number(document.getElementById("pendapatan").value);
+            let kerja = Number(document.getElementById("kerja").value);
+
+            // Validasi Input Sederhana
+            if (!skor || !pendapatan || kerja === "") {
+                alert("Harap isi semua kolom formulir.");
+                return;
+            }
+
+            let risiko;
+            let plafon;
+            let bunga;
+            let badgeClass;
+
+            // --- STRUKTUR UTAMA IF-ELSE (Tetap Dipertahankan & Dioptimalkan) ---
+            if (skor >= 750 && pendapatan >= 10000000 && kerja >= 3) {
+                risiko = "RISIKO RENDAH";
+                plafon = "Rp 150.000.000";
+                bunga = "7.5% p.a.";
+                badgeClass = "risk-badge risk-low";
+            }
+            else if (skor >= 650 && pendapatan >= 5000000 && kerja >= 1) {
+                risiko = "RISIKO SEDANG";
+                plafon = "Rp 50.000.000";
+                bunga = "12.0% p.a.";
+                badgeClass = "risk-badge risk-mid";
+            }
+            else {
+                risiko = "RISIKO TINGGI";
+                plafon = "Ditolak (Rp 0)";
+                bunga = "N/A";
+                badgeClass = "risk-badge risk-high";
+            }
+
+            // --- MANIPULASI DOM UI MODERN ---
+            // Sembunyikan placeholder, tampilkan box hasil
+            document.getElementById("placeholder").style.display = "none";
+            document.getElementById("result-content").style.display = "block";
+
+            // Update isi text dan style secara dinamis
+            document.getElementById("risk-badge").className = badgeClass;
+            document.getElementById("risk-badge").innerText = risiko;
+
+            if (risiko === "RISIKO TINGGI") {
+                document.getElementById("hasil-keputusan").innerText = "Pengajuan Ditangguhkan";
+                document.getElementById("hasil-keputusan").style.color = "var(--high-risk)";
+            } else {
+                document.getElementById("hasil-keputusan").innerText = "Pengajuan Disetujui";
+                document.getElementById("hasil-keputusan").style.color = "white";
+            }
+
+            document.getElementById("plafon-limit").innerText = plafon;
+            document.getElementById("bunga-rate").innerText = bunga;
+        }
+    </script>
+</body>
+
+</html>
